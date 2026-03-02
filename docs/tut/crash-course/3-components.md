@@ -38,6 +38,18 @@ return Button
 local create = vide.create
 
 local Button = require(Button)
+local Slider = require(Slider)
+local source = vide.source
+local effect = vide.effect
+
+local fov = source(70)
+
+effect(function()
+    local cam = workspace.CurrentCamera
+    if cam then
+        cam.FieldOfView = fov()
+    end
+end)
 
 local function Menu()
     return create "ScreenGui" {
@@ -55,9 +67,70 @@ local function Menu()
             Activated = function()
                 print "go to next page"
             end
+        },
+
+        -- Minimal usage of Slider as a component
+        Slider {
+            Position = UDim2.fromOffset(200, 420),
+            label = "Camera FOV",
+            min = 60,
+            max = 90,
+            step = 1,
+            value = fov,
+            format = function(v)
+                return string.format("%d", math.floor(v + 0.5))
+            end,
         }
     }
 end
+
+return Menu
+
+```
+
+```luau [slider.luau]
+
+-- Example of a component that wraps the built-in slider component.
+
+local source = vide.source
+
+export type SliderTheme = {
+    trackColor: Color3?,
+    trackTransparency: number?,
+    fillColor: Color3?,
+    fillTransparency: number?,
+    knobColor: Color3?,
+    knobTransparency: number?,
+    strokeColor: Color3?,
+    strokeTransparency: number?,
+    cornerRadius: number?,
+    knobRadius: number?,
+}
+
+export type SliderProps = {
+    value: source.source<number>, -- required
+
+    label: string?,
+    min: number?,
+    max: number?,
+    step: number?,
+
+    format: ((number) -> string)?,
+    onChanged: ((number) -> ())?,
+
+    size: UDim2?,
+    position: UDim2?,
+    anchorPoint: Vector2?,
+    layoutOrder: number?,
+
+    theme: SliderTheme?,
+}
+
+local function Slider(props: SliderProps)
+    return vide.slider(props)
+end
+
+return Slider
 ```
 
 :::
